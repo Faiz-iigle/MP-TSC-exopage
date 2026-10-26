@@ -26,7 +26,14 @@
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
-    <a href="index.html" class="nav-highlight">Fan Page</a>
+    <!-- musik latar -->
+    <div class="nav-actions">
+      <button type="button" class="music-toggle" id="music-toggle" aria-label="Play background music" aria-pressed="false" title="Play music">
+        <span class="wave" aria-hidden="true"><i style="--h: 2px; --d: 0s"></i><i style="--h: 6px; --d: -0.3s"></i><i style="--h: 11px; --d: -0.7s"></i><i style="--h: 8px; --d: -0.15s"></i><i style="--h: 18px; --d: -0.5s"></i><i style="--h: 9px; --d: -0.9s"></i><i style="--h: 13px; --d: -0.25s"></i><i style="--h: 6px; --d: -0.6s"></i><i style="--h: 2px; --d: -0.4s"></i></span>
+      </button>
+      <audio id="bg-music" src="audio/background%20audio.mp3" loop preload="auto"></audio>
+      <a href="index.html" class="nav-highlight">Fan Page</a>
+    </div>
   </header>
 
   <main>
@@ -196,9 +203,67 @@
     <p class="footer-note">EXO photos and music belong to SM Entertainment.</p>
   </footer>
 
-  <!-- Tahun otomatis di footer -->
   <script>
+    // tahun footer
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    // musik latar
+    var music = document.getElementById("bg-music");
+    var musicBtn = document.getElementById("music-toggle");
+    var pausedByUser = false;
+    music.volume = 0.5;
+
+    function setMusicState(isPlaying) {
+      musicBtn.classList.toggle("playing", isPlaying);
+      musicBtn.setAttribute("aria-pressed", isPlaying);
+      musicBtn.setAttribute("aria-label", isPlaying ? "Pause background music" : "Play background music");
+      musicBtn.title = isPlaying ? "Pause music" : "Play music";
+    }
+
+    // kalau gagal play (tab lama didiamkan), load ulang audionya
+    function playMusic() {
+      return music.play().catch(function (err) {
+        if (err.name === "NotAllowedError") throw err;
+        music.load();
+        return music.play();
+      });
+    }
+
+    // autoplay diblokir browser -> mulai pas user klik / tekan tombol
+    var unlockEvents = ["pointerdown", "keydown", "touchstart"];
+    function unlockMusic(e) {
+      unlockEvents.forEach(function (name) {
+        document.removeEventListener(name, unlockMusic, true);
+      });
+      if (musicBtn.contains(e.target)) return;
+      if (!pausedByUser && music.paused) playMusic().catch(function () {});
+    }
+
+    playMusic().catch(function () {
+      unlockEvents.forEach(function (name) {
+        document.addEventListener(name, unlockMusic, true);
+      });
+    });
+
+    musicBtn.addEventListener("click", function () {
+      if (music.paused) {
+        pausedByUser = false;
+        playMusic().catch(function () {});
+      } else {
+        pausedByUser = true;
+        music.pause();
+      }
+    });
+
+    // balik ke tab, lanjut lagi (kecuali di-pause)
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden && !pausedByUser && music.paused && navigator.userActivation && navigator.userActivation.hasBeenActive) {
+        playMusic().catch(function () {});
+      }
+    });
+
+    music.addEventListener("play", function () { setMusicState(true); });
+    music.addEventListener("pause", function () { setMusicState(false); });
   </script>
 
   <!-- Tombol kembali ke atas -->

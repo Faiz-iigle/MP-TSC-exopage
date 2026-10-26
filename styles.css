@@ -1,4 +1,6 @@
-/* Warna utama */
+/* EXO Fan Page: stylesheet untuk index.html dan profile.html */
+
+/* Warna utama (diambil dari poster EXO) */
 :root {
   --bg: #0d0f12;
   --card: #16191e;
@@ -7,7 +9,7 @@
   --text: #e9e7e2;
   --text-muted: #9ba1aa;
   --silver: #c9ccd1;
-  --red: #e05a52;
+  --red: #e05a52; /* lebih terang agar lolos kontras WCAG AA */
 }
 
 /* Reset */
@@ -19,11 +21,12 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 89.6px;
+  scroll-padding-top: 89.6px; /* tinggi navbar, agar judul section tidak tertutup */
   background-color: var(--bg);
-  overflow-x: hidden;
+  overflow-x: hidden; /* cegah scroll horizontal dari background yang di-zoom */
 }
 
+/* Font isi; Gowun Batang untuk huruf Korea */
 body {
   color: var(--text);
   font-family: "EB Garamond", "Gowun Batang", serif;
@@ -31,6 +34,7 @@ body {
   line-height: 1.65;
 }
 
+/* Font judul */
 h1, h2, h3, h4 {
   font-family: "Cinzel", "Gowun Batang", serif;
   font-weight: 600;
@@ -71,7 +75,8 @@ body::before {
   background-position: center;
 }
 
-/* Lapisan 2: poster blur, muncul perlahan saat di-scroll */
+/* Lapisan 2: poster blur, muncul perlahan saat di-scroll.
+   Hanya opacity yang dianimasikan agar scroll tetap ringan. */
 body::after {
   content: "";
   position: fixed;
@@ -83,7 +88,6 @@ body::after {
   background-size: cover;
   background-position: center;
   filter: blur(12.8px);
-
   animation: bg-fade ease-out both;
   animation-timeline: scroll(root);
   animation-range: 0 70vh;
@@ -108,6 +112,7 @@ body::after {
 }
 
 /* ---------- Navbar ---------- */
+/* Grid 3 kolom: logo | menu | aksi */
 .navbar {
   position: sticky;
   top: 9.6px;
@@ -118,7 +123,7 @@ body::after {
   margin: 11.2px 22.4px 0;
   padding: 11.2px 22.4px;
   background-color: rgba(13, 15, 18, 0.6);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px); 
   border: 1px solid var(--border);
   border-radius: 12.8px;
 }
@@ -159,7 +164,6 @@ body::after {
 
 /* Tombol Creator / Fan Page */
 .nav-highlight {
-  justify-self: end;
   padding: 6.4px 16px;
   font-family: "Cinzel", serif;
   font-size: 12px;
@@ -182,6 +186,105 @@ body::after {
   animation: none;
 }
 
+/* musik + creator */
+.nav-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 9.6px;
+}
+
+/* ---------- Tombol musik ---------- */
+.music-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38.4px;
+  height: 38.4px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+}
+
+.music-toggle:hover {
+  border-color: var(--silver);
+}
+
+.music-toggle:focus-visible {
+  outline: 2px solid var(--silver);
+  outline-offset: 3px;
+}
+
+/* glow pas play */
+.music-toggle.playing {
+  border-color: var(--silver);
+  background-color: rgba(201, 204, 209, 0.08);
+  animation: music-glow 2s ease-in-out infinite;
+}
+
+@keyframes music-glow {
+  0%, 100% { box-shadow: 0 0 6.4px rgba(201, 204, 209, 0.35), inset 0 0 6.4px rgba(201, 204, 209, 0.2); }
+  50%      { box-shadow: 0 0 16px rgba(201, 204, 209, 0.75), inset 0 0 9.6px rgba(201, 204, 209, 0.35); }
+}
+
+/* --h & --d diatur di HTML */
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 1.6px;
+  height: 19.2px;
+}
+
+.wave i {
+  display: block;
+  width: 1.6px;
+  height: var(--h);
+  min-height: 1.6px;
+  background-color: var(--text-muted);
+  border-radius: 1.6px;
+  opacity: 0.4;
+  transform: scaleY(0.8);
+  transform-origin: center;
+  transition: background-color 0.3s, opacity 0.3s, transform 0.3s;
+}
+
+/* gelombang gerak pas play */
+.music-toggle.playing .wave i {
+  background-color: var(--silver);
+  opacity: 1;
+  animation: wave-play 0.9s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+
+@keyframes wave-play {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+
+/* coret pas pause */
+.music-toggle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25.6px;
+  height: 1.6px;
+  background-color: var(--red);
+  border-radius: 1.6px;
+  box-shadow: 0 0 0 1.6px var(--bg);
+  transform: translate(-50%, -50%) rotate(-45deg) scaleX(1);
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+.music-toggle.playing::before {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-45deg) scaleX(0);
+}
+
 @keyframes glow-pulse {
   0%, 100% {
     background-color: rgba(201, 204, 209, 0.18);
@@ -195,7 +298,6 @@ body::after {
 
 /* ---------- Hero ---------- */
 .hero {
-  /* teks mulai di bawah tulisan poster */
   padding: 58vh 38.4px 76.8px;
   text-align: center;
 }
@@ -320,6 +422,7 @@ body::after {
   margin-bottom: 57.6px;
 }
 
+/* EXO-M: posisi foto dibalik */
 .unit-m {
   flex-direction: row-reverse;
 }
@@ -391,6 +494,7 @@ body::after {
   transform: scale(1.08);
 }
 
+/* Simbol kekuatan member */
 .symbol {
   position: absolute;
   top: 6.4px;
@@ -410,6 +514,7 @@ body::after {
   opacity: 0;
 }
 
+/* ikon hitam dibuat putih */
 .symbol img {
   width: 100%;
   height: 100%;
@@ -441,6 +546,7 @@ body::after {
   transition: opacity 0.35s, transform 0.35s;
 }
 
+/* :focus-within agar panel juga muncul saat navigasi keyboard */
 .member:hover .member-detail,
 .member:focus-within .member-detail {
   opacity: 1;
@@ -898,6 +1004,7 @@ body::after {
 }
 
 /* ---------- Gallery ---------- */
+/* masonry dengan CSS columns */
 .gallery {
   columns: 3 120px;
   column-gap: 22.4px;
@@ -953,7 +1060,7 @@ body::after {
 }
 
 .lightbox img {
-  position: relative;
+  position: relative; /* di atas .lb-close agar klik foto tidak menutup lightbox */
   max-width: 84vw;
   max-height: 84vh;
 }
@@ -1299,7 +1406,7 @@ fieldset label {
     padding: 9.6px 12.8px;
   }
 
-  .nav-highlight {
+  .nav-actions {
     justify-self: center;
   }
 
